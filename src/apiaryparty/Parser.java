@@ -193,8 +193,8 @@ public class Parser
 					node = hidden.getNode(id);
 					node.setCaptured(true);
 					node.setNeighborAmount(0);
-					while(itr.hasNext())
-						node.addNeighbor(hidden.getNode(Integer.parseInt(itr.next())));
+					//while(itr.hasNext())
+					//	node.addNeighbor(hidden.getNode(Integer.parseInt(itr.next())));
 					break;
 				case -1: default:
 					//budget -= Parameters.INVALID_RATE;
