@@ -4,7 +4,7 @@ import java.util.Random;
 
 /**
  * Defender agent. The actions for the defender in this game include strengthening nodes, adding firewalls, and adding honeypots.
- * All logic/equations/formulas/etc for how your defender decides to select actions should be included in run()
+ * All logic/equations/formulas/etc for how your defender decides to select actions should be included in makeAction()
  */
 public abstract class Defender
 {
