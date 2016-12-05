@@ -56,5 +56,5 @@ public class Parameters {
     /**Penalty for successfully capturing a honey pot*/
     public static final int HONEY_PENALTY = -10;
     /**Attacker's Budget*/
-    public static final int ATTACKER_BUDGET = ATTACK_RATE * NUMBER_OF_NODES;
+    public static final int ATTACKER_BUDGET = ATTACKER_RATE * NUMBER_OF_NODES;
 }
