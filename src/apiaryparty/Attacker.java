@@ -156,7 +156,7 @@ public abstract class Attacker{
     }
     
     public final void actionResult(Network net){
-    	net = net;
+    	this.net = net;
     	capturedNodes = net.getCapturedNodes();
         availableNodes = net.getAvailableNodes();
         result(net.getNode(lastNodeID));
