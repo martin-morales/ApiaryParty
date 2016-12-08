@@ -214,7 +214,7 @@ public class DefenderMonitor
             	}
             	boolean isDatabase = honeyNode.isDatabase();
             	
-            	int[] honeyNeighbors = new int[honeyNode.neighbor.size()];
+            	int[] honeyNeighbors = new int[honeyNode.neighbor.size()+1];
             	honeyNeighbors[0] = honeyNode.getNodeID();
             	
             	for(int i = 1; i < honeyNode.neighbor.size(); i++){
