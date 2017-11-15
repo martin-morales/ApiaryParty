@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * changed when the full tournament is run.
  * 
  * @author Marcus Gutierrez, Oscar Veliz, Porag Chowdhury, Anjon Basak
- * @version 2015/11/17
+ * @version 2017/11/14
  */
 public class GameMaster {
 	
@@ -68,7 +68,7 @@ public class GameMaster {
 				//new DefenderMonitor(defender.getName(), defender.getGraph());
 				dm.getNetwork().setName(defenderNames[d]+"-"+g);
 				dm.getNetwork().printNetwork();
-				//dm.getNetwork().shuffleNetwork();
+				dm.getNetwork().shuffleNetwork();//comment this out for testing
 				dm.getNetwork().printHiddenNetwork();
 			}
 		}
