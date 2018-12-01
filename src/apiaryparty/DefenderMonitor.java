@@ -46,12 +46,15 @@ public class DefenderMonitor
         try
         {
             pw = new PrintWriter(name+"-"+graphFile + ".defense", "UTF-8");
+            pw.close();
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
     }
+    
+    
     /**
      * Constructor used by Defender to initialize defense file and keep track of network changes.
      * @param defenderName defender name
@@ -70,6 +73,8 @@ public class DefenderMonitor
              e.printStackTrace();
          }
     }
+    
+    
     /**
      * Intializes the defender monitor with a defender
      * @param d the defender
@@ -80,6 +85,7 @@ public class DefenderMonitor
     	net = new Network(d.net);
     }
 
+    
     /**
      * Constructor used by GameMaster to create new secured graph based on Defender's defense actions.
      * @param defenderName Name of defender prepended to defense file i.e. "tower" for tower-1.defense
@@ -112,7 +118,8 @@ public class DefenderMonitor
                     case 1://firewall
                         int id1 = Integer.parseInt(itr.next());
                         int id2 = Integer.parseInt(itr.next());
-                        System.out.println("Attempting to remove Edge [" + id1 + "," + id2 + "]");
+                        if(Parameters.VERBOSITY)
+                        	System.out.println("Attempting to remove Edge [" + id1 + "," + id2 + "]");
                         if(isValidFirewall(id1,id2)){
                             Node n1 = net.getNode(id1);
                             Node n2 = net.getNode(id2);
@@ -147,6 +154,7 @@ public class DefenderMonitor
                      break;
                 }
             }
+			System.out.println("HELLO WORLD");
             parser.close();
         }catch (Exception e){
             e.printStackTrace();
@@ -156,6 +164,8 @@ public class DefenderMonitor
         net.printNetwork();
         net.printHiddenNetwork();
     }
+    
+    
     /**
      * Applies the defender action
      * @param action the defender action
@@ -178,7 +188,8 @@ public class DefenderMonitor
             case FIREWALL://firewall
                 int id1 = action.getFwall1();
                 int id2 = action.getFwall2();
-                System.out.println("Attempting to remove Edge [" + id1 + "," + id2 + "]");
+                if(Parameters.VERBOSITY)
+                	System.out.println("Attempting to remove Edge [" + id1 + "," + id2 + "]");
                 if(isValidFirewall(id1,id2)){
                     Node n1 = net.getNode(id1);
                     Node n2 = net.getNode(id2);
@@ -232,35 +243,34 @@ public class DefenderMonitor
              default://some other case not defined
                 budget -= Parameters.INVALID_RATE;
              break;
-        }
-
-    	
+        }  	
     }
 
+    
     /**
      * Defender should call this method when done adding actions.
      */
-    public void close()
-    {
+    public void close() {
+    	pw.flush();
         pw.close();
     }
+    
 
     /**
      * Action has been deemed invalid
      */
-    public void invalid()
-    {
+    public void invalid() {
         budget -= Parameters.INVALID_RATE;
         pw.write("-1");
         pw.println();
     }
 
+    
     /**
      * Adds 1 to a node security value if the node is not public or not already at maximum security.
      * @param id The id of the node being strengthened
      */
-    public void strengthen(int id)
-    {
+    public void strengthen(int id) {
         if(isValidStrengthen(id))
         {
             Node n = net.getNode(id);
@@ -273,6 +283,7 @@ public class DefenderMonitor
             invalid();
     }
 
+    
     /**
      * Removes the edge between two nodes. Will not remove if doing so will isolate a node. Will not remove if there is no
      * edge to remove.
@@ -280,8 +291,7 @@ public class DefenderMonitor
      * @param id1 First node's id
      * @param id2 Second node's id
      */
-    public void firewall(int id1, int id2)
-    {
+    public void firewall(int id1, int id2) {
         if(isValidFirewall(id1, id2))
         {
             Node n1 = net.getNode(id1);
@@ -293,11 +303,13 @@ public class DefenderMonitor
             pw.println();
         }
         else{
-        	System.out.println("Cannot firewall [" + id1 + "," + id2 + "]");
+        	if(Parameters.VERBOSITY)
+        		System.out.println("Cannot firewall [" + id1 + "," + id2 + "]");
             invalid();
         }
     }
 
+    
     /**
      * Adds a honeypot node to the graph if possible. Otherwise charges an invalid.
      * @param sv Security Value for the honeypot
@@ -305,8 +317,7 @@ public class DefenderMonitor
      * @param isDB if it is a database
      * @param honeyNodeID the node to attach the honeypot to
      */
-    public void honeypot(int sv, int pv, boolean isDB, int honeyNodeID)
-    {
+    public void honeypot(int sv, int pv, boolean isDB, int honeyNodeID) {
     	Node honeyNode = net.getNode(honeyNodeID);
     	
     	int[] newNeighbors = new int[honeyNode.neighbor.size()+1];
@@ -332,18 +343,18 @@ public class DefenderMonitor
             invalid();
         }
     }
+    
 
     /**
      * Returns current budget.
      * @return current budget
      */
-    public int getBudget()
-    {
+    public int getBudget() {
         return budget;
     }
+    
 
-    public boolean isValidStrengthen(int id)
-    {
+    public boolean isValidStrengthen(int id) {
         if(budget < Parameters.STRENGTHEN_RATE){
             return false;
         }else
@@ -354,8 +365,7 @@ public class DefenderMonitor
     }
 
  
-    public boolean isValidFirewall(int id1, int id2)
-    {
+    public boolean isValidFirewall(int id1, int id2) {
         if(budget < Parameters.FIREWALL_RATE)
             return false;
         else
@@ -374,6 +384,7 @@ public class DefenderMonitor
         }
     }
     
+    
     /**
      * checking if the firewalls with disconnect the graph
      * @n1 the first node
@@ -391,6 +402,7 @@ public class DefenderMonitor
     	n2.neighbor.add(n1);
     	return n1Dis && n2Dis;
     }
+    
     
     /**
      * checks if the node is reachable from the start
@@ -418,6 +430,7 @@ public class DefenderMonitor
     	}
     	return false;
     }
+    
 
     public boolean isValidHoneypot(int honeyNodeID){
     	Node honeyNode = net.getNode(honeyNodeID);
@@ -439,6 +452,7 @@ public class DefenderMonitor
         }
     }
     
+    
     public boolean isValidHoneypot(int honeyNodeID, int[] newNeighbors){
         if(budget < honeypotCost(honeyNodeID))
             return false;
@@ -453,11 +467,13 @@ public class DefenderMonitor
         }
     }
     
-    public void endGame(){
+    
+    public void endGame() {
     	budget = -1;
     }
     
-    public int honeypotCost(int honeyNode){
+    
+    public int honeypotCost(int honeyNode) {
     	return net.getNode(honeyNode).getPv() + Parameters.HONEYPOT_RATE;
     	/*switch(ht){
     		case NETWORKED_CONVIENCE:
@@ -474,7 +490,9 @@ public class DefenderMonitor
     	}*/
     }
     
-    public Network getNetwork(){
+    
+    public Network getNetwork() {
     	return net;
     }
+    
 }

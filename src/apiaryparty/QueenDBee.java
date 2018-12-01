@@ -13,7 +13,7 @@ public class QueenDBee extends Defender{
 	
 	   public QueenDBee(String graphFile)
 	   {
-	        super("QeenDBee",graphFile);
+	        super("QueenDBee",graphFile);
 	   }
 
 	   @Override

@@ -79,6 +79,8 @@ public class Parser
 			}
 			if(deleteJunkFile)
 				gFile.delete();
+			parser.close();
+			parseRecords.close();
 			return network;
 		}
 		catch (IOException e) 
@@ -203,6 +205,7 @@ public class Parser
 			}
 			if(deleteJunkFile)
 				hFile.delete();
+			parser.close();
 			return hidden;
 		}
 		catch(NumberFormatException nfe){ nfe.printStackTrace(); }
@@ -251,10 +254,41 @@ public class Parser
 					break;
 				}
 			}
+			parser.close();
 			return budget;
 		}
 		catch(NumberFormatException nfe){ nfe.printStackTrace(); }
 		catch (IOException e) { e.printStackTrace();}
 		return budget;
+	}
+	
+	
+	public static void clean_files(String[] defNames, String[] atkNames, int numGames) {
+		for(int game = 0; game < numGames; game++) {
+			File baseFile = new File(game + ".graph");
+			baseFile.delete();
+			
+			for(String defender : defNames) {
+				boolean errorOnDelete = false;
+				
+				File graphFile = new File(defender + "-" + game + ".graph");
+				if(graphFile.delete())
+					errorOnDelete = true;
+				
+				File defenseFile = new File(defender + "-" + game + ".defense");
+				if(defenseFile.delete())
+					errorOnDelete = true;
+				
+				File hiddenFile = new File(defender + "-" + game + "-hidden.graph");
+				if(hiddenFile.delete())
+					errorOnDelete = true;
+				
+				for(String attacker : atkNames) {
+					File historyFile = new File(attacker + "-" + defender + "-" + game + ".history");
+					if(historyFile.delete())
+						errorOnDelete = true;
+				}
+			}
+		}
 	}
 }

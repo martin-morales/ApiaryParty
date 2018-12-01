@@ -503,6 +503,7 @@ public class Network {
 				capturedNodes.add(nodes[i]);
 		return capturedNodes;
 	}
+	
 
 	/**
 	 * Returns an array list of all the available nodes for attacking
@@ -518,5 +519,36 @@ public class Network {
 			}
 		}
 		return availableNodes;
+	}
+	
+	
+	/**
+	 * @return String of contents of network
+	 */
+	public String toString() {
+		String contents = "";
+		for(int i = 0; i < nodes.length; i++) {
+			Node nd = this.nodes[i];
+			contents += "Node " + i + ": (PV: " + 
+					nd.getPv() + ", SV: " + 
+					nd.getSv() + ", DB: " + 
+					nd.isDatabase() + ", HP: " + 
+					nd.getHoneyPot() + ")\r\n";
+			contents += "    Neighbors: ";
+			int neighborCounter = 0;
+			int neighborSize = nd.neighbor.size();
+			for(Node neighbor: nd.neighbor){
+				if(neighbor.getNodeID()!=nd.getNodeID()){
+					if(neighborCounter==neighborSize-1)
+						contents += neighbor.getNodeID();
+					else 
+						contents += neighbor.getNodeID() + ",";
+				}
+				neighborCounter++;
+			}
+			if(i < nodes.length - 1)
+				contents += "\r\n";
+		}
+		return contents;
 	}
 }

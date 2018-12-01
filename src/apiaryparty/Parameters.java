@@ -4,6 +4,11 @@ package apiaryparty;
  */
 
 public class Parameters {
+	/**Determines if information is printed to console*/
+    public static final boolean VERBOSITY = false;
+    /**Determines if generated graph files are removed after tournament*/
+    public static final boolean GRAPH_CLEANUP = true;
+	
 	/**Time limit for initialization in milliseconds*/
     public static final int INIT_TIME = 1000;
     /**Time limit for calculating an action result in milliseconds*/

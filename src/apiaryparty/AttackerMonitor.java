@@ -41,7 +41,8 @@ public class AttackerMonitor
 	 */
 	public AttackerMonitor(String attackerName, String defenderName, String graphName){
 		budget = Parameters.ATTACKER_BUDGET;
-		System.out.println("Initial Budget1: " + budget);
+		if(Parameters.VERBOSITY)
+			System.out.println("Initial Budget: " + budget);
 		r = new Random();
 		this.attackerName = attackerName;
 		this.defenderName = defenderName;
@@ -98,7 +99,8 @@ public class AttackerMonitor
 							//points += Parameters.HONEY_PENALTY;
 							//points -= visibleNet.getNode(id).getPv();
 							budget = 0;
-							System.out.println("attack on node " + id + " triggered a honeypot with a roll of " + attackRoll + "! Ending round.");
+							if(Parameters.VERBOSITY)
+								System.out.println("attack on node " + id + " triggered a honeypot with a roll of " + attackRoll + "! Ending round.");
 							history.println("0," + id + ",true," + attackRoll + "," + n.getPv() + "," + n.getSv() + "," + n.isDatabase() + "," + n.getHoneyPot());
 							break;
 						}else{
@@ -109,16 +111,19 @@ public class AttackerMonitor
 							}*/
 						}
 						neighbors = neighbors.substring(0, neighbors.length()-1);
-						System.out.println("attack on node " + id + " was successful with a roll of " + attackRoll + "!");
+						if(Parameters.VERBOSITY)
+							System.out.println("attack on node " + id + " was successful with a roll of " + attackRoll + "!");
 						//history.println("0," + id + ",true," + attackRoll + "," + n.getPv() + "," + n.getSv() + "," + n.isDatabase() + "," + n.getHoneyPot() + neighbors);
 						history.println("0," + id + ",true," + attackRoll + "," + n.getPv() + "," + n.getSv() + "," + n.isDatabase() + "," + n.getHoneyPot());
 					}else{
-						System.out.println("attack on node " + id + " was unsuccessful with a roll of " + attackRoll);
+						if(Parameters.VERBOSITY)
+							System.out.println("attack on node " + id + " was unsuccessful with a roll of " + attackRoll);
 						history.println("0," + id + ",false," + attackRoll);
 					}
 				}
 				else{
-					System.out.println("Invalid attack on node "+ id + "! " + isAvailableNode(id));
+					if(Parameters.VERBOSITY)
+						System.out.println("Invalid attack on node "+ id + "! " + isAvailableNode(id));
 					history.println("-1");
 					budget -= Parameters.INVALID_RATE;
 				}
@@ -140,7 +145,8 @@ public class AttackerMonitor
 							//points += Parameters.HONEY_PENALTY;
 							//points -= visibleNet.getNode(id).getPv();
 							budget = 0;
-							System.out.println("super attack on node " + id + " triggered a honeypot with a roll of " + attackRoll + "! Ending round.");
+							if(Parameters.VERBOSITY)
+								System.out.println("super attack on node " + id + " triggered a honeypot with a roll of " + attackRoll + "! Ending round.");
 							history.println("1," + id + ",true," + attackRoll + "," + n.getPv() + "," + n.getSv() + "," + n.isDatabase() + "," + n.getHoneyPot());
 							break;
 						}else{
@@ -151,16 +157,19 @@ public class AttackerMonitor
 							}*/
 						}
 						neighbors = neighbors.substring(0, neighbors.length()-1);
-						System.out.println("super attack on node " + id + " was successful with a roll of " + attackRoll + "!");
+						if(Parameters.VERBOSITY)
+							System.out.println("super attack on node " + id + " was successful with a roll of " + attackRoll + "!");
 						//history.println("1," + id + ",true," + attackRoll + "," + n.getPv() + "," + n.getSv() + "," + n.isDatabase() + "," + n.getHoneyPot() + neighbors);
 						history.println("1," + id + ",true," + attackRoll + "," + n.getPv() + "," + n.getSv() + "," + n.isDatabase() + "," + n.getHoneyPot());
 					}else{
-						System.out.println("super attack on node " + id + " was unsuccessful with a roll of " + attackRoll);
+						if(Parameters.VERBOSITY)
+							System.out.println("super attack on node " + id + " was unsuccessful with a roll of " + attackRoll);
 						history.println("1," + id + ",false," + attackRoll);
 					}
 				}
 				else{
-					System.out.println("Invalid superattack on node "+ id + "! " + isAvailableNode(id));
+					if(Parameters.VERBOSITY)
+						System.out.println("Invalid superattack on node "+ id + "! " + isAvailableNode(id));
 					history.println("-1");
 					budget -= Parameters.INVALID_RATE;
 				}
@@ -176,11 +185,13 @@ public class AttackerMonitor
 					int sv = n.getSv();
 					visibleNet.getNode(id).setPv(pv);
 					//visibleNet.getNode(id).setSv(sv);
-					System.out.println("probed node " + id + "'s point value: " + pv);
+					if(Parameters.VERBOSITY)
+						System.out.println("probed node " + id + "'s point value: " + pv);
 					history.println("2," + id + "," + pv + "," + sv);
 				}
 				else{
-					System.out.println("Invalid probing of point value on node "+ id + "! " + isAvailableNode(id));
+					if(Parameters.VERBOSITY)
+						System.out.println("Invalid probing of point value on node "+ id + "! " + isAvailableNode(id));
 					history.println("-1");
 					budget -= Parameters.INVALID_RATE;
 				}
@@ -193,11 +204,13 @@ public class AttackerMonitor
 					Node n = net.getNode(id);
 
 					visibleNet.getNode(id).setHoneyPot(n.isHoneyPot());
-					System.out.println("probed node " + id + "'s honey pot: " + n.isHoneyPot());
+					if(Parameters.VERBOSITY)
+						System.out.println("probed node " + id + "'s honey pot: " + n.isHoneyPot());
 					history.println("3," + id + "," + n.getHoneyPot());
 				}
 				else{
-					System.out.println("Invalid probing of honey pot on node "+ id + "! " + isAvailableNode(id));
+					if(Parameters.VERBOSITY)
+						System.out.println("Invalid probing of honey pot on node "+ id + "! " + isAvailableNode(id));
 					history.println("-1");
 					budget -= Parameters.INVALID_RATE;
 				}
@@ -206,7 +219,8 @@ public class AttackerMonitor
 				budget = 0;
 				break;
 			default://some other case not defined
-				System.out.println("Invalid Move!");
+				if(Parameters.VERBOSITY)
+					System.out.println("Invalid Move!");
 				history.println("-1");
 				budget -= Parameters.INVALID_RATE;
 				break;
