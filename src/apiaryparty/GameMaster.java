@@ -84,6 +84,7 @@ public class GameMaster {
 		attackers.add(new Beedrill());
 		attackers.add(new YellowJacket());
 		// ADD YOUR STUDENT ATTACKER AGENTS HERE
+		attackers.add(new BeeGees());
 		
 
 		// get names of attackers
@@ -121,7 +122,7 @@ public class GameMaster {
 							continue;
 						tryAttacker(new AttackerDriver(PlayerState.RESULT, attacker, visible));
 						if(Parameters.VERBOSITY) {
-							System.out.println("Budget after move: "+ am.getBudget());
+							System.out.println("Budget after move: "+ am.getBudget());	// Out of sync
 							System.out.println();
 						}
 					}
@@ -149,6 +150,7 @@ public class GameMaster {
 		for (int i = 0; i < numGraphs; i++) {
 			Network n = new Network(i);
 			n.printNetwork();
+			System.out.println(n.toString());
 		}
 	}
 

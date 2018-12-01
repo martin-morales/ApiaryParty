@@ -59,3 +59,4 @@ doc/package-list
 *.graph
 *.defense
 *.history
+/bin/
