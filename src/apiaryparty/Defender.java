@@ -6,13 +6,15 @@ import java.util.Random;
  * Defender agent. The actions for the defender in this game include strengthening nodes, adding firewalls, and adding honeypots.
  * All logic/equations/formulas/etc for how your defender decides to select actions should be included in makeAction()
  */
-public abstract class Defender
-{
+public abstract class Defender{
+	
     protected Network net;
     private DefenderMonitor dm;
     protected String defenderName;
     protected String graph;
     private DefenderAction lastAction;
+    
+    
     /**
      * Constructor.
      * Parses Network stored in graphFile.
@@ -23,11 +25,12 @@ public abstract class Defender
      */
     public Defender(String agentName, String graphFile)
     {
-        defenderName = agentName;
+        defenderName = this.getClass().getSimpleName();
         graph = graphFile;
         net = Parser.parseGraph(graphFile+".graph");
         dm = new DefenderMonitor(net,graphFile, agentName);
     }
+    
     
     /**
      * Used for any initializations
@@ -42,6 +45,7 @@ public abstract class Defender
     	return lastAction;
     }
     
+    
     /**
      * Notifies the defender if their last action was successful and allows for computations
      * based off result of last action.
@@ -54,68 +58,76 @@ public abstract class Defender
      * Returning a null/invalid action will result in a wasted turn.
      */
     public void handleAction(){
+    	DefenderAction a;
     	lastAction = null;
-        DefenderAction a = makeAction();
-        if(a != null){
-            switch(a.getType()){
-            case STRENGTHEN:
-            	if(dm.isValidStrengthen(a.getSNode())){
-            		dm.strengthen(a.getSNode());
-            		lastAction = a;
-            		return;
-            	}else{
-            		dm.invalid();
+        try {
+        	a = makeAction();
+        	if(a != null){
+                switch(a.getType()){
+                case STRENGTHEN:
+                	if(dm.isValidStrengthen(a.getSNode())){
+                		dm.strengthen(a.getSNode());
+                		lastAction = a;
+                		return;
+                	}else{
+                		dm.invalid();
+                		lastAction = new DefenderAction(); //INVALID MOVE
+                		return;
+                	}
+                case FIREWALL:
+                	if(dm.isValidFirewall(a.getFwall1(), a.getFwall2())){
+                		dm.firewall(a.getFwall1(), a.getFwall2());
+                		lastAction = a;
+                		return;
+                	}else{
+                		dm.invalid();
+                		lastAction = new DefenderAction(); //INVALID MOVE
+                		return;
+                	}
+                case HONEYPOT:
+                	Random r = new Random();
+                	int honeyNodeID = a.getHoneyNode();
+                	Node honeyNode = net.getNode(honeyNodeID);
+                	
+                	int sv = honeyNode.getSv(); //set honeypot's SV to [-1,+1] of source honey node
+                	int randTmp = r.nextInt(3)-1;
+                	sv += randTmp;
+                	sv = Math.min(sv, 19);
+                	sv = Math.max(sv, 1);
+                	
+                	int pv = honeyNode.getPv(); //set honeypot's PV to [-1,+1] of source honey node
+                	randTmp = r.nextInt(3)-1;
+                	pv += randTmp;
+                	pv = Math.min(pv, 19);
+                	pv = Math.max(pv, 1);
+                	
+                	boolean isDatabase = honeyNode.isDatabase();
+                	
+                	if(dm.isValidHoneypot(honeyNodeID)){
+                		dm.honeypot(sv, pv, isDatabase, honeyNodeID);
+                		lastAction = a;
+                		return;
+                	}else{
+                		dm.invalid();
+                		lastAction = new DefenderAction(DefenderActionType.INVALID); //INVALID MOVE
+                		return;
+                	}
+                case END_TURN:
+                	lastAction = new DefenderAction(false);//end turn
+                	return;
+                default:
+                	dm.invalid();
             		lastAction = new DefenderAction(); //INVALID MOVE
             		return;
-            	}
-            case FIREWALL:
-            	if(dm.isValidFirewall(a.getFwall1(), a.getFwall2())){
-            		dm.firewall(a.getFwall1(), a.getFwall2());
-            		lastAction = a;
-            		return;
-            	}else{
-            		dm.invalid();
-            		lastAction = new DefenderAction(); //INVALID MOVE
-            		return;
-            	}
-            case HONEYPOT:
-            	Random r = new Random();
-            	int honeyNodeID = a.getHoneyNode();
-            	Node honeyNode = net.getNode(honeyNodeID);
-            	
-            	int sv = honeyNode.getSv(); //set honeypot's SV to [-1,+1] of source honey node
-            	int randTmp = r.nextInt(3)-1;
-            	sv += randTmp;
-            	sv = Math.min(sv, 19);
-            	sv = Math.max(sv, 1);
-            	
-            	int pv = honeyNode.getPv(); //set honeypot's PV to [-1,+1] of source honey node
-            	randTmp = r.nextInt(3)-1;
-            	pv += randTmp;
-            	pv = Math.min(pv, 19);
-            	pv = Math.max(pv, 1);
-            	
-            	boolean isDatabase = honeyNode.isDatabase();
-            	
-            	if(dm.isValidHoneypot(honeyNodeID)){
-            		dm.honeypot(sv, pv, isDatabase, honeyNodeID);
-            		lastAction = a;
-            		return;
-            	}else{
-            		dm.invalid();
-            		lastAction = new DefenderAction(DefenderActionType.INVALID); //INVALID MOVE
-            		return;
-            	}
-            case END_TURN:
-            	lastAction = new DefenderAction(false);//end turn
-            	return;
-            default:
-            	dm.invalid();
-        		lastAction = new DefenderAction(); //INVALID MOVE
-        		return;
+                }
             }
+        }catch(Exception e) { //Defender crashed, consider move invalid
+        	dm.invalid();
+    		lastAction = new DefenderAction(); //INVALID MOVE
+    		return;
         }
     }
+    
     
     /**
      * given the node id will returns true if you can strengthen it. false otherwise.
@@ -125,6 +137,8 @@ public abstract class Defender
     protected boolean isValidStrengthen(int node){
     	return dm.isValidStrengthen(node);
     }
+    
+    
     /**
      * given two nodes id will returns true if you can firewall it. false otherwise.
      * @param node1 the first node
@@ -134,6 +148,8 @@ public abstract class Defender
     protected boolean isValidFirewall(int node1, int node2){
     	return dm.isValidFirewall(node1, node2);
     }
+    
+    
     /**
      * given the node id will returns true if it is a valid honeypot
      * @param honeyNode the node id
@@ -143,15 +159,17 @@ public abstract class Defender
     	return dm.isValidHoneypot(honeyNode);
     }
 
+    
     /**
      * Get Agent Name used by GameMaster.
      * @return Name of defender
      */
     public final String getName()
     {
-        return defenderName;
+    	return this.getClass().getSimpleName();
     }
 
+    
     /**
      * Get Game used by GameMaster
      * @return graph number
@@ -160,12 +178,14 @@ public abstract class Defender
     {
         return graph;
     }
+    
 
     /**
      * Defender logic goes here
      * @return the action
      */
     public abstract DefenderAction makeAction();
+    
     
     /**
      * Returns remaining defender budget
@@ -175,6 +195,7 @@ public abstract class Defender
     	return dm.getBudget();
     }
     
+    
     /**
      * Ends game
      */
@@ -182,6 +203,7 @@ public abstract class Defender
     	dm.endGame();
     	dm.close();
     }
+    
     
     /**
      * Computes the cost of a honeypot based on source node of honeypot

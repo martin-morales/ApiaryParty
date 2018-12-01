@@ -1,5 +1,6 @@
 package apiaryparty;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
 /**
@@ -30,6 +31,8 @@ public class GameMaster {
 		defenders.add(new WorkerBee("0"));
 		defenders.add(new Honeycomb("0"));
 		defenders.add(new QueenDBee("0"));
+		// ADD YOUR STUDENT DEFENDER AGENTS HERE
+		
 
 		// get names of defenders
 		String[] defenderNames = new String[defenders.size()];
@@ -60,10 +63,11 @@ public class GameMaster {
 						}
 					}else{
 						tryDefender(new DefenderDriver(PlayerState.RESULT, defender, false));
-
 					}
 					//System.out.println(defender.getBudget());
 				}while(execute && defender.getBudget() > 0 );
+				defender.endGame();
+				
 				new DefenderMonitor(defender.getName(), g+"",defense);
 				//new DefenderMonitor(defender.getName(), defender.getGraph());
 				dm.getNetwork().setName(defenderNames[d]+"-"+g);
@@ -73,12 +77,14 @@ public class GameMaster {
 			}
 		}
 		
-		// add Attackers here
+		// Attacker List
 		ArrayList<Attacker> attackers = new ArrayList<Attacker>();
 		attackers.add(new GreenHornet());
 		attackers.add(new BumbleBeeMan());
 		attackers.add(new Beedrill());
 		attackers.add(new YellowJacket());
+		// ADD YOUR STUDENT ATTACKER AGENTS HERE
+		
 
 		// get names of attackers
 		String[] attackerNames = new String[attackers.size()];
@@ -87,6 +93,8 @@ public class GameMaster {
 		int numAttackers = attackerNames.length;
 		// initialize point matrix
 		int[][] points = new int[numDefenders][numAttackers];
+		
+		int gameNum = 1;
 
 		// execute attackers
 		for (int d = 0; d < numDefenders; d++) {
@@ -94,6 +102,12 @@ public class GameMaster {
 			for (int a = 0; a < numAttackers; a++) {
 				String attackerName = attackerNames[a];
 				for (int g = 0; g < numGames; g++) {
+					if(Parameters.VERBOSITY) {
+						System.out.println("Game Number " + gameNum++);
+						System.out.println(defenderName + " vs " + attackerName);
+						System.out.println();
+					}
+					
 					String graphName = g + "";
 					AttackerMonitor am = new AttackerMonitor(attackerName,defenderName, graphName);
 					Attacker attacker = getAttacker(defenderName,attackerName, graphName);
@@ -106,14 +120,20 @@ public class GameMaster {
 						if(visible == null)
 							continue;
 						tryAttacker(new AttackerDriver(PlayerState.RESULT, attacker, visible));
-						System.out.println("Budget after move: "+ am.getBudget());
-						System.out.println();
+						if(Parameters.VERBOSITY) {
+							System.out.println("Budget after move: "+ am.getBudget());
+							System.out.println();
+						}
 					}
 					am.close();
 					points[d][a] += am.getPoints();
 				}
 			}
 		}
+		//Clean up created files
+		if(Parameters.GRAPH_CLEANUP)
+			Parser.clean_files(defenderNames, attackerNames, numGames);
+		
 		// perform analysis
 		new Analyzer(points, attackerNames, defenderNames);
 		
@@ -141,14 +161,14 @@ public class GameMaster {
 	 *            graph defender will read
 	 * @return your defender
 	 */
-	public static Defender getDefender(String name, String file) {
-		if (name.equalsIgnoreCase("WorkerBee"))
-			return new WorkerBee(file);
-		if (name.equalsIgnoreCase("Honeycomb"))
-			return new Honeycomb(file);
-		if (name.equalsIgnoreCase("QeenDBee"))
-			return new QueenDBee(file);
-		// add your defender
+	public static Defender getDefender(String defName, String file) {
+		try {
+			Class<?> defenderClass = Class.forName("apiaryparty." + defName);
+			Constructor<?> defenderConstr = defenderClass.getConstructor(String.class);
+			return (Defender) defenderConstr.newInstance(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		// invalid defender if name could not be found
 		return new Defender("", "") {
@@ -165,25 +185,21 @@ public class GameMaster {
 	 * 
 	 * @param defName
 	 *            name of defender attacker will be pit against
-	 * @param atName
-	 *            name of defender
+	 * @param atkName
+	 *            name of attacker
 	 * @param file
-	 *            graph defender will attack
+	 *            graph attacker will attack
 	 * @return your attacker
 	 */
-	public static Attacker getAttacker(String defName, String atName,
-			String file) {
-		if (atName.equalsIgnoreCase("GreenHornet"))
-			return new GreenHornet(defName, file);
-		if (atName.equalsIgnoreCase("BumbeBeeMan"))
-			return new BumbleBeeMan(defName, file);
-		if (atName.equalsIgnoreCase("Beedrill"))
-			return new Beedrill(defName, file);
-		if (atName.equalsIgnoreCase("YellowJacket"))
-			return new YellowJacket(defName, file);
-
-		// add your attacker here
-
+	public static Attacker getAttacker(String defName, String atkName, String file) {
+		try {
+			Class<?> attackerClass = Class.forName("apiaryparty." + atkName);
+			Constructor<?> attackerConstr = attackerClass.getConstructor(String.class, String.class);
+			return (Attacker) attackerConstr.newInstance(defName, file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		// in case your name was not added
 		return new Attacker("", "", "") {
 			protected void initialize() {}
@@ -192,6 +208,7 @@ public class GameMaster {
 			}
 			protected void result(Node lastNode) {}
 		};
+		
 	}
 	
 	/**

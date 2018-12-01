@@ -4,9 +4,6 @@ import java.util.Random;
 
 /**
  * Example attacker agent.
- * IMPORTANT NOTE: 	Your attacker object will be recreated for every action. Because of this,
- * 					model your Attacker to only make a decision on the current information. Do
- * 					not try to use variables that will carry on in to the next makeSingleAction()
  * 
  * Make use of the three protected variables inherited from Attacker. These variables include:
  * protected ArrayList&lt;Node&gt; capturedNodes - a list of the already captured nodes
