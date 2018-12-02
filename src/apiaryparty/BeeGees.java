@@ -3,7 +3,6 @@ package apiaryparty;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.Random;
 
 /**
  * Strategy: Bayesian game where the cost of parameters determines the strategy we play
@@ -17,7 +16,6 @@ public class BeeGees extends Attacker {
 
     private final static String attackerName = "BeeGees";
     
-    public Random r;
     // Bayesian Game where the cost of parameters determines the strategy we play
     // 0: Prob/HP 
     private int strategy = -1;
@@ -41,20 +39,19 @@ public class BeeGees extends Attacker {
 	 * If you need to initialize anything, do it  here
 	 */
 	protected void initialize(){
-		r = new Random();
 		
 		if(Parameters.PROBE_POINTS_RATE + Parameters.PROBE_HONEY_RATE + Parameters.ATTACK_RATE <= Parameters.ATTACKER_RATE) {
 			strategy = 1;
-			System.out.println("Choosing strategy 1");
+			//System.out.println("Choosing strategy 1");
 		} else if(Parameters.PROBE_HONEY_RATE + Parameters.ATTACK_RATE <= Parameters.ATTACKER_RATE) {
 			strategy = 2;
-			System.out.println("Choosing strategy 2");
+			//System.out.println("Choosing strategy 2");
 		} else if(Parameters.PROBE_POINTS_RATE + Parameters.ATTACK_RATE <= Parameters.ATTACKER_RATE) {
 			strategy = 3;
-			System.out.println("Choosing strategy 3");
+			//System.out.println("Choosing strategy 3");
 		} else {
 			strategy = 4;
-			System.out.println("Choosing strategy 4");
+			//System.out.println("Choosing strategy 4");
 		}
 	}
 
@@ -63,6 +60,9 @@ public class BeeGees extends Attacker {
 	 * @return your action
 	 */
 	public AttackerAction makeAction() {
+		// No nodes left
+		if(availableNodes.size()==0)
+            return new AttackerAction(AttackerActionType.INVALID,0);
 
 		// Probe all nodes' point values
 		if(strategy == 1 || strategy == 3) {		// Strategies where probing for points is cheap
@@ -117,17 +117,17 @@ public class BeeGees extends Attacker {
 
 		// Find best move to make
 		int bestNodeID = -1;
-		double bestCost = Integer.MIN_VALUE;
+		double bestValue = Integer.MIN_VALUE;
 		int typeOfAtk = -1;
-		
+		// Loop through expected values to find best node to attack
 		for(int i = 0; i < expValues.size(); i++) {
 			for(Entry<Integer, Double> entry : expValues.get(i).entrySet()) {
-			    Integer key = entry.getKey();
-			    Double value = entry.getValue();
+			    Integer nodeID = entry.getKey();
+			    Double expValue = entry.getValue();
 
-			    if(value > bestCost) {
-			    	bestNodeID = key;
-			    	bestCost = value;
+			    if(expValue > bestValue) {
+			    	bestNodeID = nodeID;
+			    	bestValue = expValue;
 			    	typeOfAtk = i;
 			    }
 			}

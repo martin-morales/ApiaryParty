@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 /**
- * Strategy: 
+ * Strategy: Maxmin, ignores chance/security values and just attacks nodes with highest values
  * @author Martin Morales, Cynthia Valencia
  */
 public class BumbleGum extends Attacker {
@@ -42,7 +42,29 @@ public class BumbleGum extends Attacker {
 	 * @return your action
 	 */
 	public AttackerAction makeAction() {
-		return new AttackerAction(AttackerActionType.END_TURN, -1);
+		// No nodes left
+		if(availableNodes.size()==0)
+            return new AttackerAction(AttackerActionType.INVALID,0);
+		
+		// Probe all nodes' point values
+		for(Node node : availableNodes) {
+			if(node.getPv() == -1) {		// Have not checked this node yet
+				//System.out.println("Probing points of " + node.getNodeID());
+				return new AttackerAction(AttackerActionType.PROBE_POINTS, node.getNodeID());
+			}
+		}
+		
+		// Attack node with highest point value
+		int highestPoints = -1;
+		int bestNodeID = -1;
+		for(Node node : availableNodes) {
+			if(node.getPv() > highestPoints) {
+				highestPoints = node.getPv();
+				bestNodeID = node.getNodeID();
+			}
+		}
+		
+		return new AttackerAction(AttackerActionType.ATTACK, bestNodeID);
 	}
 
 	/**
