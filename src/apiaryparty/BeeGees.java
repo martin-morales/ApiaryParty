@@ -71,18 +71,7 @@ public class BeeGees extends Attacker {
 				honeypotCount++;
 			}
 		}
-
-		// Probe all nodes' point values
-		if(strategy == 1 || strategy == 3) {		// Strategies where probing for points is cheap
-			for(Node node : availableNodes) {
-				//System.out.println(node.getNodeID() + " sv: " + node.getSv() + " pv: " + node.getPv());
-				if(node.getPv() == -1) {		// Have not checked this node yet
-					//System.out.println("Probing points of " + node.getNodeID());
-					return new AttackerAction(AttackerActionType.PROBE_POINTS, node.getNodeID());
-				}
-			}
-		}
-
+		
 		// Probe for honeypots, if there are some left to discover
 		if(strategy== 1 || strategy == 2) {			// Strategies where probing for HPs is cheap
 			if(net.getNodes().length - honeypotCount > Parameters.NUMBER_OF_NODES) {		// Checks if honeypots left to probe
@@ -94,7 +83,18 @@ public class BeeGees extends Attacker {
 				}
 			}
 		}
-		
+
+		// Probe all nodes' point values if they are not honeypots
+		if(strategy == 1 || strategy == 3) {		// Strategies where probing for points is cheap
+			for(Node node : availableNodes) {
+				//System.out.println(node.getNodeID() + " sv: " + node.getSv() + " pv: " + node.getPv());
+				if(node.getPv() == -1 && !node.isHoneyPot()) {		// Have not checked this node yet
+					//System.out.println("Probing points of " + node.getNodeID());
+					return new AttackerAction(AttackerActionType.PROBE_POINTS, node.getNodeID());
+				}
+			}
+		}
+
 		return makeMaxExpValDecision();
 	}
 
@@ -153,7 +153,7 @@ public class BeeGees extends Attacker {
 	
 	/**
 	 * Loops through all available nodes and calculates their expected value
-	 * NodeExpValue = PV * (RollChance - SV / RollChance) - RollCost
+	 * NodeExpValue = PV * (RollChance - SV - 1)/ RollChance - RollCost
 	 * Assumes all available nodes have point values. Probe all available nodes before calling this
 	 */
 	private ArrayList<HashMap<Integer, Double>> calculateExpValues() {

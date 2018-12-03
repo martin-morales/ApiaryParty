@@ -272,27 +272,22 @@ public class GameMaster {
 
 		System.out.println("---Parameters used---");
 		
-		//Parameters.NUMBER_OF_NODES = r.nextInt(15) + 1;
-		System.out.println("number of nodes: "+ Parameters.NUMBER_OF_NODES);
-		
 		do {
+			Parameters.NUMBER_OF_NODES = r.nextInt(15) + 1;
 			Parameters.NUMBER_OF_PUBLIC_NODES = r.nextInt(3) + 1;
-		} while(Parameters.NUMBER_OF_PUBLIC_NODES >= Parameters.NUMBER_OF_NODES);
-		System.out.println("public nodes: "+ Parameters.NUMBER_OF_PUBLIC_NODES);
-		
-		do {
 			Parameters.NUMBER_OF_DATABASE_NODES = r.nextInt(3) + 1;
-		} while(Parameters.NUMBER_OF_DATABASE_NODES >= Parameters.NUMBER_OF_NODES - Parameters.NUMBER_OF_PUBLIC_NODES);
+		} while(Parameters.NUMBER_OF_PUBLIC_NODES >= Parameters.NUMBER_OF_NODES &&
+				Parameters.NUMBER_OF_DATABASE_NODES >= Parameters.NUMBER_OF_NODES - Parameters.NUMBER_OF_PUBLIC_NODES);
+		System.out.println("number of nodes: "+ Parameters.NUMBER_OF_NODES);
+		System.out.println("public nodes: "+ Parameters.NUMBER_OF_PUBLIC_NODES);
 		System.out.println("DB nodes: "+ Parameters.NUMBER_OF_DATABASE_NODES);
 		
 		do {
 			Parameters.MAX_NEIGHBORS = r.nextInt(5) + 2;
-		} while(Parameters.MAX_NEIGHBORS > Parameters.NUMBER_OF_NODES);
-		System.out.println("max neighbors: "+ Parameters.MAX_NEIGHBORS);
-		
-		do {
 			Parameters.MIN_NEIGHBORS = r.nextInt(5) + 1;
-		} while(Parameters.MIN_NEIGHBORS >= Parameters.MAX_NEIGHBORS);
+		} while(Parameters.MAX_NEIGHBORS > Parameters.NUMBER_OF_NODES ||
+				Parameters.MIN_NEIGHBORS >= Parameters.MAX_NEIGHBORS);
+		System.out.println("max neighbors: "+ Parameters.MAX_NEIGHBORS);
 		System.out.println("min neighbors: "+ Parameters.MIN_NEIGHBORS);
 		
 		Parameters.MAX_POINT_VALUE = r.nextInt(10) + 15;
