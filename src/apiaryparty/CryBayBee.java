@@ -1,7 +1,5 @@
 package apiaryparty;
 
-import com.sun.xml.internal.rngom.digested.DDataPattern;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

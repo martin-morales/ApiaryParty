@@ -34,7 +34,7 @@ public class GameMaster {
 		defenders.add(new Honeycomb("0"));
 		defenders.add(new QueenDBee("0"));
 		// ADD YOUR STUDENT DEFENDER AGENTS HERE
-		
+		defenders.add(new CryBayBee("0"));
 
 		// get names of defenders
 		String[] defenderNames = new String[defenders.size()];
