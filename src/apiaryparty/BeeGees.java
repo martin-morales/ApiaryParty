@@ -63,6 +63,14 @@ public class BeeGees extends Attacker {
 		// No nodes left
 		if(availableNodes.size()==0)
             return new AttackerAction(AttackerActionType.INVALID,0);
+		
+		// Count how many honeypots I've found so far (once I've found all, I stop probing for them to save budget)
+		int honeypotCount = 0;
+		for(Node node : availableNodes) {		// Assumes that I haven't tried capturing a honeypot
+			if(node.isHoneyPot()) {
+				honeypotCount++;
+			}
+		}
 
 		// Probe all nodes' point values
 		if(strategy == 1 || strategy == 3) {		// Strategies where probing for points is cheap
@@ -75,9 +83,9 @@ public class BeeGees extends Attacker {
 			}
 		}
 
-		// Probe for honeypots, if there are some
+		// Probe for honeypots, if there are some left to discover
 		if(strategy== 1 || strategy == 2) {			// Strategies where probing for HPs is cheap
-			if(net.getNodes().length > Parameters.NUMBER_OF_NODES) {
+			if(net.getNodes().length - honeypotCount > Parameters.NUMBER_OF_NODES) {		// Checks if honeypots left to probe
 				for(Node node : availableNodes) {
 					if(node.getHoneyPot() == -1) {		// Have not checked this node yet
 						//System.out.println("Probing if " + node.getNodeID() + " is a honeypot");
@@ -167,7 +175,7 @@ public class BeeGees extends Attacker {
 			}
 			
 			if(node.isHoneyPot()) {
-				expValues.put(node.getNodeID(), (double) Parameters.HONEY_PENALTY);
+				expValues.put(node.getNodeID(), (double) Parameters.HONEY_PENALTY - Parameters.ATTACK_RATE);
 			} else {
 				if(forAtk) {
 					double chance = (double) (Parameters.ATTACK_ROLL - node.getSv() - 1) / Parameters.ATTACK_ROLL;	// ex. SV=5 -> 14/20, since defender wins ties

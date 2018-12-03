@@ -6,12 +6,12 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 /**
- * Strategy: Maxmin, ignores chance/security values and just probes all nodes and attacks highest value first
+ * Strategy: Maxmin, assumes PV ~= SV to avoid probing and attacks the highest SV node with super attacks
  * @author Martin Morales, Cynthia Valencia
  */
-public class BumbleGum extends Attacker {
+public class Beeverly extends Attacker {
 
-    private final static String attackerName = "BumbleGum";
+    private final static String attackerName = "Beeverly";
     
     public Random r;
 
@@ -20,13 +20,13 @@ public class BumbleGum extends Attacker {
      * @param defenderName defender's name
      * @param graphFile graph to read
      */
-	public BumbleGum(String defenderName, String graphFile) {
+	public Beeverly(String defenderName, String graphFile) {
 		super(attackerName, defenderName, graphFile);
 	}
 	/**
 	 * Default constructor do not change
 	 */
-	public BumbleGum(){
+	public Beeverly(){
 		super(attackerName);
 	}
 	
@@ -46,20 +46,12 @@ public class BumbleGum extends Attacker {
 		if(availableNodes.size()==0)
             return new AttackerAction(AttackerActionType.INVALID,0);
 		
-		// Probe all nodes' point values
-		for(Node node : availableNodes) {
-			if(node.getPv() == -1) {		// Have not checked this node yet
-				//System.out.println("Probing points of " + node.getNodeID());
-				return new AttackerAction(AttackerActionType.PROBE_POINTS, node.getNodeID());
-			}
-		}
-		
-		// Attack node with highest point value
-		int highestPoints = -1;
+		// Attack node with highest security value
+		int highestSecurity = -1;
 		int bestNodeID = -1;
 		for(Node node : availableNodes) {
-			if(node.getPv() > highestPoints) {
-				highestPoints = node.getPv();
+			if(node.getSv() > highestSecurity) {
+				highestSecurity = node.getSv();
 				bestNodeID = node.getNodeID();
 			}
 		}

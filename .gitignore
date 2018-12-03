@@ -60,3 +60,5 @@ doc/package-list
 *.defense
 *.history
 /bin/
+
+summed_values.txt

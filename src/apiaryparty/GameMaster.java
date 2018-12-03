@@ -88,6 +88,7 @@ public class GameMaster {
 		// ADD YOUR STUDENT ATTACKER AGENTS HERE
 		attackers.add(new BeeGees());
 		attackers.add(new BumbleGum());
+		attackers.add(new Beeverly());
 		
 
 		// get names of attackers
@@ -303,21 +304,21 @@ public class GameMaster {
 		Parameters.DEFENDER_RATE = r.nextInt(8) + 8;
 		System.out.println("defender rate: "+ Parameters.DEFENDER_RATE);
 		
-		Parameters.STRENGTHEN_RATE = r.nextInt(5) + 5;
-		System.out.println("strengthen rate: "+ Parameters.STRENGTHEN_RATE);
-		
 		Parameters.INVALID_RATE = r.nextInt(8) + 8;
 		System.out.println("invalid rate: "+ Parameters.INVALID_RATE);
 		
-		do {
-			Parameters.FIREWALL_RATE = r.nextInt(5) + 6;
-		} while(Parameters.FIREWALL_RATE < Parameters.STRENGTHEN_RATE);
-		System.out.println("firewall rate: "+ Parameters.FIREWALL_RATE);
+		
 		
 		do {
+			Parameters.STRENGTHEN_RATE = r.nextInt(5) + 5;
+			Parameters.FIREWALL_RATE = r.nextInt(5) + 6;
 			Parameters.HONEYPOT_RATE = r.nextInt(10) + 10;
-		} while(Parameters.HONEYPOT_RATE < Parameters.FIREWALL_RATE);
+		} while(Parameters.FIREWALL_RATE < Parameters.STRENGTHEN_RATE &&
+				Parameters.HONEYPOT_RATE < Parameters.FIREWALL_RATE);
+		System.out.println("strengthen rate: "+ Parameters.STRENGTHEN_RATE);
+		System.out.println("firewall rate: "+ Parameters.FIREWALL_RATE);
 		System.out.println("honeypot rate: "+ Parameters.HONEYPOT_RATE);
+		
 		
 		Parameters.ATTACKER_RATE = r.nextInt(8) + 8;
 		System.out.println("attacker rate: "+ Parameters.ATTACKER_RATE);
@@ -325,24 +326,21 @@ public class GameMaster {
 		Parameters.ATTACK_ROLL = r.nextInt(10) + 15;
 		System.out.println("attack roll: "+ Parameters.ATTACK_ROLL);
 		
-		Parameters.ATTACK_RATE = r.nextInt(10) + 5;
-		System.out.println("attack rate: "+ Parameters.ATTACK_RATE);
-		
-		Parameters.PROBE_POINTS_RATE = r.nextInt(5) + 1;
-		System.out.println("probe points rate: "+ Parameters.PROBE_POINTS_RATE);
-		
-		do {
-			Parameters.PROBE_HONEY_RATE = r.nextInt(5) + 1;
-		} while(Parameters.PROBE_HONEY_RATE > Parameters.PROBE_POINTS_RATE);
-		System.out.println("probe honey rate: "+ Parameters.PROBE_HONEY_RATE);
-		
 		Parameters.SUPERATTACK_ROLL = r.nextInt(30) + 35;
 		System.out.println("super attack roll: "+ Parameters.SUPERATTACK_ROLL);
 		
 		do {
+			Parameters.ATTACK_RATE = r.nextInt(10) + 5;
+			Parameters.PROBE_POINTS_RATE = r.nextInt(5) + 1;
+			Parameters.PROBE_HONEY_RATE = r.nextInt(5) + 1;
 			Parameters.SUPERATTACK_RATE = r.nextInt(10) + 15;
-		} while(Parameters.SUPERATTACK_RATE <= Parameters.ATTACK_RATE ||
+		} while(Parameters.PROBE_HONEY_RATE > Parameters.PROBE_POINTS_RATE &&
+				Parameters.SUPERATTACK_RATE <= Parameters.ATTACK_RATE &&
 				Parameters.SUPERATTACK_RATE <= Parameters.PROBE_POINTS_RATE);
+		
+		System.out.println("attack rate: "+ Parameters.ATTACK_RATE);
+		System.out.println("probe points rate: "+ Parameters.PROBE_POINTS_RATE);
+		System.out.println("probe honey rate: "+ Parameters.PROBE_HONEY_RATE);
 		System.out.println("super attack rate: "+ Parameters.SUPERATTACK_RATE);
 		
 		Parameters.HONEY_PENALTY = r.nextInt(8) + 8;
